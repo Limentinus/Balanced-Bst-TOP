@@ -50,9 +50,28 @@ class Tree
   end
 
   def delete(root = @root, key)
-    if root.nil?
-      return root
+    return nil if root.nil?
+
+    if key < root.data
+      root.left = delete(root.left, key)
+    elsif key > root.data
+      root.right = delete(root.right, key)
+    else
+      if root.left.nil? || root.right.nil?
+        root = (root.left.nil?) ? root.right : root.left
+      else
+        successor = find_successor(root.right)
+        root.data = successor.data
+        root.right = delete(successor.data, root.right)
+      end
     end
+    return root
+  end
+
+  def find_successor(root)
+    current = root
+    current = current.left until current.left.nil?
+    return current
   end
 
 end
@@ -63,4 +82,6 @@ test_tree.pretty_print
 # p test_tree.root
 test_tree.insert(513)
 test_tree.insert(13)
+test_tree.delete(9)
+test_tree.delete(4)
 test_tree.pretty_print
