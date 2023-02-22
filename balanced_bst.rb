@@ -62,7 +62,7 @@ class Tree
       else
         successor = find_successor(root.right)
         root.data = successor.data
-        root.right = delete(successor.data, root.right)
+        root.right = delete(root.right, successor.data)
       end
     end
     return root
@@ -74,14 +74,57 @@ class Tree
     return current
   end
 
+  def find(root = @root, value)
+    return nil if root.nil?
+    return root if value == root.data
+
+    if value < root.data
+      find(root.left, value)
+    elsif value > root.data
+      find(root.right, value)
+    end
+  end
+
+  def level_order(root = @root)
+    return if root.nil?
+
+    queue = [root]
+    result = []
+    until queue.empty?
+      current = queue.shift
+      result << (block_given? ? yield(current) : current.data)
+      queue << current.left if current.left
+      queue << current.right if current.right
+    end
+    result
+  end
+
+  def level_order_rec(root = @root, result = [], queue = [root], &block)
+    return if root.nil?
+    
+    current = queue.shift
+    queue << current.left if current.left
+    queue << current.right if current.right
+    
+    result << (block_given? ? block.call(current) : current.data)
+
+    level_order_rec(queue.first, result, queue, &block) 
+
+    result
+  end
+  
+
 end
 
 test_array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
 test_tree = Tree.new(test_array)
 test_tree.pretty_print
 # p test_tree.root
-test_tree.insert(513)
-test_tree.insert(13)
-test_tree.delete(9)
-test_tree.delete(4)
-test_tree.pretty_print
+# test_tree.insert(513)
+# test_tree.insert(13)
+# test_tree.delete(9)
+# test_tree.delete(4)
+# test_tree.pretty_print
+# p test_tree.level_order { |el| el.data * 2}
+p test_tree.level_order_rec { |el| el.data * 2}
+# p test_tree.find(324)
