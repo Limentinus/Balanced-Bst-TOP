@@ -112,8 +112,44 @@ class Tree
 
     result
   end
+
+  def inorder_rec(root = @root, result = [], &block)
+    return if root.nil?
+    
+    inorder_rec(root.left, result, &block) unless root.left.nil?
+    result << (block_given? ? block.call(root) : root.data) 
+    inorder_rec(root.right, result, &block) unless root.right.nil?
+    result
+
+  end
+
+  def preorder_rec(root = @root, result = [], &block)
+    return if root.nil?
+
+    result << (block_given? ? block.call(root) : root.data)
+    preorder_rec(root.left, result, &block) unless root.left.nil?
+    preorder_rec(root.right, result, &block) unless root.right.nil?
+    result
+  end
+
+  def postorder_rec(root = @root, result = [], &block)
+    return if root.nil?
+
+    postorder_rec(root.left, result, &block) unless root.left.nil?
+    postorder_rec(root.right, result, &block) unless root.right.nil?
+    result << (block_given? ? block.call(root) : root.data)
+    result
+  end
+
+  def height(node)
+    return 0 if node.nil?
+    return [height(node.left), height(node.right)].max + 1
+  end
   
 
+  def depth
+
+  end
 end
 
 test_array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
@@ -126,5 +162,9 @@ test_tree.pretty_print
 # test_tree.delete(4)
 # test_tree.pretty_print
 # p test_tree.level_order { |el| el.data * 2}
-p test_tree.level_order_rec { |el| el.data * 2}
+# p test_tree.level_order_rec { |el| el.data * 2}
 # p test_tree.find(324)
+# p test_tree.inorder_rec { |el| el.data * 2}
+# p test_tree.preorder_rec { |el| el.data * 2}
+# p test_tree.postorder_rec { |el| el.data * 2}
+p test_tree.height(test_tree.find(9))
