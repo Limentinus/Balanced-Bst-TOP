@@ -12,12 +12,10 @@ class Tree
   attr_accessor :array, :root
   def initialize(array)
     @array = array.uniq.sort
-    @end_index = @array.length - 1
-    @start_index = 0
     @root = build_tree
   end
 
-  def build_tree(array = @array, start_index = @start_index, end_index = @end_index)
+  def build_tree(array = @array, start_index = 0, end_index = array.length - 1)
     return if start_index > end_index
 
     root = (start_index + end_index) / 2
@@ -38,7 +36,7 @@ class Tree
       root = Node.new(key)
       return root
     end
-    p root.data
+    
     if key < root.data
       root.left = insert(root.left, key)
     elsif key > root.data
@@ -147,17 +145,72 @@ class Tree
   end
   
 
-  def depth
-
+  def depth(node = @root, current_depth = 0, target_value)
+    return current_depth if node.nil?
+  
+    if node.data == target_value
+      return current_depth
+    elsif target_value < node.data
+      return depth(node.left, current_depth + 1, target_value)
+    else
+      return depth(node.right, current_depth + 1, target_value)
+    end
   end
+  
+  def balanced?(root = @root)
+    return true if root.nil?
+
+    left_height = height(root.left)
+    right_height = height(root.right)
+
+    if (left_height - right_height).abs <= 1 && balanced?(root.left) == true && balanced?(root.right) == true
+      return true
+    end
+
+    return false
+  end
+
+  def rebalance
+    @array = inorder_rec
+    @root = build_tree(@array)
+  end
+
 end
 
-test_array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
-test_tree = Tree.new(test_array)
-test_tree.pretty_print
+def driver_script
+  test_array = (Array.new(15) {rand(1..100)})
+  test_tree = Tree.new(test_array)
+  p "test_array is: #{test_tree.array}"
+  test_tree.pretty_print
+  p "Balanced?: #{test_tree.balanced?}"
+  p "Level Order: #{test_tree.level_order_rec}"
+  p "Preorder: #{test_tree.preorder_rec}"
+  p "Inorder: #{test_tree.inorder_rec}"
+  p "Postorder: #{test_tree.postorder_rec}"
+  p "Add some elements to the tree"
+  test_tree.insert(200)
+  test_tree.insert(300)
+  test_tree.insert(400)
+  test_tree.insert(500)
+  test_tree.pretty_print
+  p "Balanced?: #{test_tree.balanced?}"
+  p "Rebalance"
+  test_tree.rebalance
+  test_tree.pretty_print
+  p "Balanced?: #{test_tree.balanced?}"
+  
+end
+
+# test_array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
+# test_tree = Tree.new(test_array)
+# test_tree.pretty_print
 # p test_tree.root
 # test_tree.insert(513)
 # test_tree.insert(13)
+# test_tree.insert(12)
+# test_tree.insert(700)
+# test_tree.insert(7005)
+# test_tree.insert(73)
 # test_tree.delete(9)
 # test_tree.delete(4)
 # test_tree.pretty_print
@@ -167,4 +220,12 @@ test_tree.pretty_print
 # p test_tree.inorder_rec { |el| el.data * 2}
 # p test_tree.preorder_rec { |el| el.data * 2}
 # p test_tree.postorder_rec { |el| el.data * 2}
-p test_tree.height(test_tree.find(9))
+# p test_tree.height(test_tree.find(23))
+# p test_tree.depth(23)
+# p test_tree.balanced?
+# test_tree.rebalance
+# test_tree.pretty_print
+# p test_tree.balanced?
+
+
+driver_script
